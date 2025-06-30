@@ -63,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
             <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+            <a href="dashboard.php" class="btn btn-link">На главную</a>
         </form>
     </div>
 </body>
