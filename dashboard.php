@@ -17,6 +17,13 @@ $sql = "SELECT u.*, GROUP_CONCAT(r.name SEPARATOR ', ') as roles
         WHERE u.id = $user_id";
 $result = $conn->query($sql);
 $user = $result->fetch_assoc();
+
+// Безопасная проверка роли VK
+$isVkUser = false;
+if (!empty($user['roles'])) {
+    $isVkUser = strpos($user['roles'], 'vk_user') !== false;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -32,7 +39,17 @@ $user = $result->fetch_assoc();
         <h2>Добро пожаловать, <?= htmlspecialchars($user['username']) ?>!</h2>
         
         <div class="alert alert-info">
-            <strong>Ваши роли:</strong> <?= htmlspecialchars($user['roles']) ?>
+            <strong>Ваша роль:</strong> <?= htmlspecialchars($user['roles']) ?>
+        </div>
+
+                        <!-- Защищенная информация -->
+            <div class="mt-4">
+            <p>Это текст, доступный всем авторизованным пользователям.</p>
+            
+                <?php if ($isVkUser): ?>
+                <img src="path_to_your_image.jpg" alt="Изображение для VK пользователей" class="img-fluid">
+                <?php endif; ?>
+            </div>
         </div>
 
         <nav class="navbar navbar-light bg-light">

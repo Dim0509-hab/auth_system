@@ -11,6 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = mysqli_real_escape_string($conn, $_POST['username']);
     $password = $_POST['password'];
     
+    // Получаем IP-адрес пользователя
+    $ip_address = $_SERVER['REMOTE_ADDR'];
+    
     // Проверяем существование пользователя
     $sql = "SELECT * FROM users WHERE username = '$username'";
     $result = $conn->query($sql);
@@ -39,23 +42,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $failed_attempts = $user['failed_attempts'] + 1;
             $conn->query("UPDATE users SET failed_attempts = $failed_attempts, last_failed_attempt = NOW() WHERE id = {$user['id']}");
             
-            // Записываем неудачную попытку в лог
-            log_attempt($username, 'failed', 'Неверный пароль');
+            // Записываем неудачную попытку в БД
+            $sql_log = "INSERT INTO auth_logs (username, ip_address, attempt_time, status, message) 
+                        VALUES ('$username', '$ip_address', NOW(), 'failed', 'Неверный пароль')";
+            $conn->query($sql_log);
+            
+            // Записываем неудачную попытку в файл log.txt
+            $log_message = "
+            [".date('Y-m-d H:i:s')."] 
+            Username: $username
+            IP: $ip_address
+            Status: failed
+            Message: Неверный пароль
+            -----------------------------------
+            ";
+            
+            file_put_contents('log.txt', $log_message, FILE_APPEND);
         }
-    } else {
-        // Пользователь не найден
-        $error = 'Пользователь не найден';
-        log_attempt($username, 'failed', 'Пользователь не найден');
-    }
-}
-
-function log_attempt($username, $status, $message) {
-    global $conn;
-    $ip = $_SERVER['REMOTE_ADDR'];
-    
-    $sql = "INSERT INTO auth_logs (username, ip_address, status, message) 
-            VALUES ('$username', '$ip', '$status', '$message')";
-    $conn->query($sql);
+        } else {
+            // Пользователь не найден
+            $error = 'Пользователь не найден';
+        
+            // Записываем неудачную попытку в БД
+            $sql_log = "INSERT INTO auth_logs (username, ip_address, attempt_time, status, message) 
+                    VALUES ('$username', '$ip_address', NOW(), 'failed', 'Пользователь не найден')";
+            $conn->query($sql_log);
+        
+             // Записываем неудачную попытку в файл log.txt
+              $log_message = "
+              [".date('Y-m-d H:i:s')."] 
+              Username: $username
+              IP: $ip_address
+              Status: failed
+               Message: Пользователь не найден
+             -----------------------------------
+             ";
+        
+            file_put_contents('log.txt', $log_message, FILE_APPEND);
+        }
 }
 ?>
 
@@ -85,8 +109,13 @@ function log_attempt($username, $status, $message) {
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
             <button type="submit" class="btn btn-primary">Войти</button>
+            
             <a href="register.php" class="btn btn-link">Зарегистрироваться</a>
         </form>
+        <!-- Кнопка VK -->
+        <a href="vk_auth.php" class="btn btn-primary mt-3">
+            Войти через VK
+        </a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
