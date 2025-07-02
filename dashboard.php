@@ -64,7 +64,7 @@ if (!empty($user['roles'])) {
             <ul class="list-group">
                 <li class="list-group-item">Просмотр профиля</li>
                 <li class="list-group-item">Управление настройками</li>
-                <!-- Здесь можно добавить дополнительные функции -->
+                
             </ul>
         </div>
     </div>

@@ -64,6 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
             <a href="dashboard.php" class="btn btn-link">На главную</a>
+            <!-- Добавить кнопку VK -->
+<button onclick="location.href='/auth_system/vk/auth.php'">
+    Зарегистрироваться через VK
+</button>
         </form>
     </div>
 </body>

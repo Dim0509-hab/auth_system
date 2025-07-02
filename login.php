@@ -2,6 +2,9 @@
 session_start();
 require_once 'config.php';
 
+// Генерируем CSRF-токен
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
 // Инициализация переменных для сообщений
 $error = '';
 $success = '';
@@ -81,6 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             file_put_contents('log.txt', $log_message, FILE_APPEND);
         }
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -111,11 +116,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit" class="btn btn-primary">Войти</button>
             
             <a href="register.php" class="btn btn-link">Зарегистрироваться</a>
-        </form>
-        <!-- Кнопка VK -->
-        <a href="vk_auth.php" class="btn btn-primary mt-3">
-            Войти через VK
-        </a>
+             <!-- Кнопка авторизации через VK -->
+              <a href="/vk/auth.php">
+            <img src="vk-button.png" alt="Войти через VK">
+            </a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
